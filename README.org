@@ -1,0 +1,4 @@
+#+TITLE: DevDial
+#+AUTHOR: Mark Warren and Joseph Edwards
+
+Play Salt-n-Pepa 'Push It' over your Asterisk phone system on git push.
