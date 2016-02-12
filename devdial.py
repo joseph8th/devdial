@@ -10,11 +10,15 @@ import sys
 
 def page_channel(channel):
 
+    connect_ip = ''
+    login_un = ''
+    login_pw = ''
+
     try:
         # connect to the manager
         try:
-            manager.connect('10.0.4.61')
-            manager.login('devmin', 'KnWaRpm0Rhcu')
+            manager.connect(connect_ip)
+            manager.login(login_un, login_pw)
 
             # get a status report
             response = manager.status()
