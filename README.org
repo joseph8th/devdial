@@ -1,4 +1,41 @@
 #+TITLE: DevDial
-#+AUTHOR: Mark Warren and Joseph Edwards
+#+AUTHOR: Mark Warren, Joseph Edwards
 
-Play Salt-n-Pepa 'Push It' over your Asterisk phone system on git push.
+*Play Salt-n-Pepa's 'Push It' (or any other custom audio) over your Asterisk phone system on ~git push~.*
+
+** Installation
+
+#+BEGIN_SRC shell
+git clone https://github.com/joseph8th/devdial.git
+#+END_SRC
+
+** Getting Started
+
+*Notes*: In native Asterisk, this could all probably be coded in a single context in the dial plan…but we had the FreePBX GUI to work with.
+
+1) Upload your audio clip in .wav, .mp3 or any other supported Asterisk audio format to the /var/lib/asterisk/sounds/custom directory, or add it in the FreePBX recordings.
+
+2) Create an announcement with the recording you just made
+
+3) Create a Paging Group and assign your extensions to it. In our example we create a paging group that is dialed with ‘999’, rings internal extensions in our dev groups and forces non-busy phones to go off-hook.
+
+4) Create a Misc Application that allows you to dial the Announcement you created in #2 paging. Also, create a feature code with the same number so that number
+is reserved and not accidentally used as an extension in the future. We used *999
+
+5) Test your dial plan changes by dialing the Misc Application/Feature Code number directly from a local phone to play your sound.
+
+6) Add a manager user/password in the /etc/asterisk/manager.conf or manager_custom.conf with permissions for your IP or subnet.
+
+7) Modify the ~devdial.py~ script with your paging group and feature code and test from your remote server or dev workstation. (The three empty variables ~connect_ip~, ~login_un~ and ~login_pw~.)
+
+8) Add a ~pre-push~ hook to your local repository's ~.git/hooks~ to call ~devdial.py~ when pushing to a git repo.
+
+** Example Hook Script:
+
+#+BEGIN_SRC shell
+#!/bin/sh
+
+/path/to/your/clone/devdial.py
+
+exit 0
+#+END_SRC
