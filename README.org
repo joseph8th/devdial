@@ -19,8 +19,7 @@ git clone https://github.com/joseph8th/devdial.git
 
 3) Create a Paging Group and assign your extensions to it. In our example we create a paging group that is dialed with ‘999’, rings internal extensions in our dev groups and forces non-busy phones to go off-hook.
 
-4) Create a Misc Application that allows you to dial the Announcement you created in #2 paging. Also, create a feature code with the same number so that number
-is reserved and not accidentally used as an extension in the future. We used *999
+4) Create a Misc Application that allows you to dial the Announcement you created in #2 paging. Also, create a feature code with the same number so that number is reserved and not accidentally used as an extension in the future. We used *999
 
 5) Test your dial plan changes by dialing the Misc Application/Feature Code number directly from a local phone to play your sound.
 
