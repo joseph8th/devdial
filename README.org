@@ -1,7 +1,7 @@
 #+TITLE: DevDial
 #+AUTHOR: Mark Warren, Joseph Edwards
 
-*Play Salt-n-Pepa's 'Push It' (or any other custom audio) over your Asterisk phone system on ~git push~.*
+*Play Salt-n-Pepa's 'Push It' (or any other custom audio) over your Asterisk phone system on git push.*
 
 ** Installation
 
