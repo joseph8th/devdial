@@ -13,7 +13,7 @@ git clone https://github.com/joseph8th/devdial.git
 
 *Notes*: In native Asterisk, this could all probably be coded in a single context in the dial plan…but we had the FreePBX GUI to work with.
 
-1) Upload your audio clip in .wav, .mp3 or any other supported Asterisk audio format to the /var/lib/asterisk/sounds/custom directory, or add it in the FreePBX recordings.
+1) Upload your audio clip in .wav, .mp3 or any other supported Asterisk audio format to the ~/var/lib/asterisk/sounds/custom~ directory, or add it in the FreePBX recordings.
 
 2) Create an announcement with the recording you just made
 
@@ -23,7 +23,7 @@ git clone https://github.com/joseph8th/devdial.git
 
 5) Test your dial plan changes by dialing the Misc Application/Feature Code number directly from a local phone to play your sound.
 
-6) Add a manager user/password in the /etc/asterisk/manager.conf or manager_custom.conf with permissions for your IP or subnet.
+6) Add a manager user/password in the ~/etc/asterisk/manager.conf~ or ~manager_custom.conf~ with permissions for your IP or subnet.
 
 7) Modify the ~devdial.py~ script to set your ~PAGING_GROUP~ and default ~feature_code~ variables, as well as your  ~CONNECT_IP~, ~LOGIN_UN~ and ~LOGIN_PW~. Then test from your remote server or dev workstation.
 
