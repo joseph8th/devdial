@@ -2,31 +2,32 @@
 
 """
 Ring phones in paging group 999 and play Salt'n Peppa OR Baby Fuckin' Wheel.
-AUTHOR: GroundControl (Mark Warren)
+AUTHORS: Mark Warren, Joseph Edwards
 """
 
 import asterisk.manager
 import sys
 
-def page_channel(channel):
+CONNECT_IP = ''
+LOGIN_UN = ''
+LOGIN_PW = ''
+PAGING_GROUP = 999
 
-    connect_ip = ''
-    login_un = ''
-    login_pw = ''
+def page_channel(feature_code):
 
     try:
         # connect to the manager
         try:
-            manager.connect(connect_ip)
-            manager.login(login_un, login_pw)
+            manager.connect(CONNECT_IP)
+            manager.login(LOGIN_UN, LOGIN_PW)
 
             # get a status report
             response = manager.status()
             #print(response)
             # Logic to do the dialing
             response = manager.command(
-                'channel originate Local/*{0}@app-miscapps extension 999@ext-paging'.format(
-                    channel
+                'channel originate Local/*{0}@app-miscapps extension {1}@ext-paging'.format(
+                    feature_code, PAGING_GROUP
                 )
             )
             #print(response.data)
@@ -49,9 +50,9 @@ def page_channel(channel):
 
 if __name__=="__main__":
     if len(sys.argv) == 2:
-        channel = sys.argv[1]
+        feature_code = sys.argv[1]
     else:
-        channel = 999
+        feature_code = 999
 
     manager = asterisk.manager.Manager()
-    page_channel(channel)
+    page_channel(feature_code)
