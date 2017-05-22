@@ -5,83 +5,85 @@ Ring phones in paging group 999 and play Salt'n Peppa OR Baby Fuckin' Wheel.
 AUTHORS: Mark Warren, Joseph Edwards
 """
 
-import asterisk.manager
-import sys
+import os, sys
 import argparse
+from asterisk.ami import AMIClient
+from asterisk.ami.action import SimpleAction
 
 VERBOSE=False
 
-def handle_shutdown(event, manager):
-    if VERBOSE:
-        print("Received shutdown event")
-    manager.close()
 
-def handle_event(event, manager):
-    if VERBOSE:
-        print("Received event: %s" % event.name)
+def dev_dial(action):
+    """Function that actually makes the asterisk call."""
 
-
-def dev_dial(command):
-    manager = asterisk.manager.Manager()
-
-    # connect to the manager
     try:
-        manager.connect('10.0.4.61')
-        manager.login('devmin', 'KnWaRpm0Rhcu')
+        client = AMIClient(address='10.0.4.61', port=5038)
+        client.login(username='devmin', secret='KnWaRpm0Rhcu')
 
-        # register some callbacks
-        manager.register_event('Shutdown', handle_shutdown) # shutdown
-        #manager.register_event('*', handle_event) # all
-
-        # Logic to do the dialing
-        response = manager.command(command)
-
-        """
-        response = manager.send_action({
-            "Action": "Originate",
-            "Channel": "SIP/vitelity-outbound/15757378046",
-            "CallerID": "CES <3052328182>",
-            "Context": "app-miscapps",
-            "Exten": "*1005",
-            "Timeout": 30,
-            "Account": "default"
-        })
-        """
-
+        future = client.send_action(action)
         if VERBOSE:
-            print("Response:", response.data or "None")
+            print(future.response or "None")
 
-        # get a status report
-        if VERBOSE:
-            response = manager.status()
-            print("Status:", response)
+        client.logoff()
 
-        manager.logoff()
-
-    except asterisk.manager.ManagerSocketException as e:
-        print("Error connecting to the manager" % e.strerror)
-        sys.exit(1)
-    except asterisk.manager.ManagerAuthException as e:
-        print("Error logging in to the manager" % e.strerror)
-        sys.exit(1)
-    except asterisk.manager.ManagerException as e:
+    except Exception as e:
         print("Error: %s" % e.strerror)
         sys.exit(1)
 
 
 if __name__=="__main__":
-    parser = argparse.ArgumentParser()
+    # Follow symbolic link
+    realfile = os.path.realpath(__file__)
+
+    # If we have a channel map then use those as choices instead of any numeric
+    CHANNEL_MAP = None
+    if os.path.exists(os.path.join(os.path.dirname(realfile), 'settings.py')):
+        from settings import CHANNEL_MAP
+    description = "Channel choices: {"+', '.join(CHANNEL_MAP.keys())+"}" if CHANNEL_MAP else None
+
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument("channel", nargs="?", default='999', help="the channel to play")
-    parser.add_argument("-e", "--extern", help="external number to dial")
     parser.add_argument("-v", "--verbose", action="store_true", help="output asterisk responses")
+    parser.add_argument("-o", "--outbound", help="outbound number to dial")
+    parser.add_argument("-e", "--exten", help="extension to dial")
+    parser.add_argument(
+        "-c", "--caller_id", default="CES <3052328182>", help="CallerID string, i.e., 'CES <3052328182>'"
+    )
     args = parser.parse_args()
 
-    page_cmd = 'channel originate Local/*{channel}@app-miscapps extension 999@ext-paging'
-    call_cmd = 'channel originate SIP/vitelity-outbound/{extern} extension *{channel}@app-miscapps'
-    if not args.extern:
-        command = page_cmd.format(channel=args.channel)
+    # If we used the channel map, then get the correct channel for the choice
+    if not args.channel.isnumeric():
+        if not CHANNEL_MAP:
+            sys.exit("Unrecognized channel slug '{0}'".format(args.channel))
+        else:
+            args.channel = CHANNEL_MAP[args.channel]
+
+    # Config args for asterisk action
+    if args.outbound:
+        cdict = {
+            "Channel": "SIP/vitelity-outbound/{outbound}".format(outbound=args.outbound),
+            "Context": "app-miscapps",
+            "Exten": "*{channel}".format(channel=args.channel),
+        }
+    elif args.exten:
+        cdict = {
+            "Channel": "SIP/{exten}".format(exten=args.exten),
+            "Context": "app-miscapps",
+            "Exten": "*{channel}".format(channel=args.channel),
+        }
     else:
-        command = call_cmd.format(channel=args.channel, extern=args.extern)
+        cdict = {
+            "Channel": "Local/*{channel}@app-miscapps".format(channel=args.channel),
+            "Context": "ext-paging",
+            "Exten": "999"
+        }
+
+    cdict.update({"CallerID": args.caller_id, "Priority": 1,})
 
     VERBOSE = args.verbose
-    dev_dial(command)
+    if VERBOSE:
+        print(cdict)
+
+    # Create action and dial
+    action = SimpleAction("Originate", **cdict)
+    dev_dial(action)
