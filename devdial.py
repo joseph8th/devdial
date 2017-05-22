@@ -17,8 +17,8 @@ def dev_dial(action):
     """Function that actually makes the asterisk call."""
 
     try:
-        client = AMIClient(address='10.0.4.61', port=5038)
-        client.login(username='devmin', secret='KnWaRpm0Rhcu')
+        client = AMIClient(address='', port=)
+        client.login(username='', secret='')
 
         future = client.send_action(action)
         if VERBOSE:
