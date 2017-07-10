@@ -1,5 +1,6 @@
 #+TITLE: DevDial
 #+AUTHOR: Mark Warren, Joseph Edwards
+#+STARTUP: showall
 
 *Play Salt-n-Pepa's 'Push It' (or any other custom audio) over your Asterisk phone system on git push.*
 
@@ -7,9 +8,13 @@
 
 #+BEGIN_SRC shell
 git clone https://github.com/joseph8th/devdial.git
+pip3 install askerisk-ami
 #+END_SRC
 
+
 ** Getting Started
+
+First edit the `settings.py` file and complete the `AUTH_CREDS`.
 
 *Notes*: In native Asterisk, this could all probably be coded in a single context in the dial plan…but we had the FreePBX GUI to work with.
 

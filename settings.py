@@ -2,6 +2,13 @@
 Map channels numbers to arbitrary names for easier remembering.
 """
 
+AUTH_CREDS = {
+    'address': '',
+    'port': 0,
+    'username': '',
+    'secret': '',
+}
+
 CHANNEL_MAP = {
     'pushit': 999,
     'babywheel': 1000,

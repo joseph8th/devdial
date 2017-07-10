@@ -17,8 +17,8 @@ def dev_dial(action):
     """Function that actually makes the asterisk call."""
 
     try:
-        client = AMIClient(address='', port=)
-        client.login(username='', secret='')
+        client = AMIClient(address=AUTH_CREDS['address'], port=AUTH_CREDS['port'])
+        client.login(username=AUTH_CREDS['username'], secret=AUTH_CREDS['secret'])
 
         future = client.send_action(action)
         if VERBOSE:
@@ -37,8 +37,10 @@ if __name__=="__main__":
 
     # If we have a channel map then use those as choices instead of any numeric
     CHANNEL_MAP = None
-    if os.path.exists(os.path.join(os.path.dirname(realfile), 'settings.py')):
-        from settings import CHANNEL_MAP
+    if not os.path.exists(os.path.join(os.path.dirname(realfile), 'settings.py')):
+        sys.exit("Settings file settings.py not found!")
+
+    from settings import CHANNEL_MAP, AUTH_CREDS
     description = "Channel choices: {"+', '.join(CHANNEL_MAP.keys())+"}" if CHANNEL_MAP else None
 
     parser = argparse.ArgumentParser(description=description)
